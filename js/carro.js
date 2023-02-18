@@ -5,8 +5,9 @@ let productos = [
 
 let carrito = [];
 let total = 0;
-
+alert("!Advertencia solo contamos con dos modelos de samsung a13 y a53¡");
 while (true) {
+  
   let producto = prompt("Ingrese el nombre del producto que desea agregar al carrito (o 'finalizar' para terminar la compra):");
 
   if (producto === "finalizar") {
