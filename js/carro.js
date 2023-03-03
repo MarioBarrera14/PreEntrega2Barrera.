@@ -1,46 +1,86 @@
-let productos = [
-  { nombre: "a13", precio: 73.999 },
-  { nombre: "a53", precio: 163.999 }
+const productos = [
+  { nombre: "a13", 
+    precio: 73.999, 
+    imagen: "img/WhatsApp Image 2023-02-18 at 14.29.32.jpeg" 
+  },
+  { nombre: "a53", 
+    precio: 163.999, 
+    imagen: "img/WhatsApp Image 2023-02-18 at 14.30.13.jpeg" 
+  }
 ];
 
 let carrito = [];
-let total = 0;
-alert("!Advertencia solo contamos con dos modelos de samsung a13 y a53¡");
-while (true) {
-  
-  let producto = prompt("Ingrese el nombre del producto que desea agregar al carrito (o 'finalizar' para terminar la compra):");
 
-  if (producto === "finalizar") {
-    console.log("Productos en el carrito:");
-    carrito.forEach(item => {
-      console.log(`${item.nombre} - Precio: $${item.precio} - Cantidad: ${item.cantidad}`);
+const listaCarrito = document.getElementById("lista-carrito");
+const totalCarrito = document.getElementById("total-carrito");
+const vaciarCarrito = document.getElementById("vaciar-carrito");
+
+function actualizarCarrito() {
+  listaCarrito.innerHTML = "";
+  carrito.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.nombre} - Precio: $${item.precio} - Cantidad: ${item.cantidad}`;
+    const img = document.createElement("img");
+    img.src = item.imagen;
+    li.appendChild(img);
+    listaCarrito.appendChild(li);
+  });
+
+  totalCarrito.textContent = `Total: $${calcularTotalCarrito()}`;
+
+  // Guardar el carrito en LocalStorage
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+function calcularTotalCarrito() {
+  return carrito.reduce((total, item) => total + item.precio * item.cantidad, 0);
+}
+
+function agregarAlCarrito(nombre, precio, imagen) {
+  const itemEnCarrito = carrito.find(item => item.nombre === nombre);
+
+  if (itemEnCarrito) {
+    itemEnCarrito.cantidad++;
+  } else {
+    carrito.push({
+      nombre,
+      precio,
+      imagen,
+      cantidad: 1
     });
-
-    if (carrito.length === 0) {
-      alert("No hay productos en el carrito.");
-    } else {
-      alert(`El total de su compra es de $${total}. ¡Gracias por su compra!`);
-    }
-    break;
   }
 
-  let seleccion = productos.find(item => item.nombre.toLowerCase() === producto.toLowerCase());
+  actualizarCarrito();
+}
 
-  if (!seleccion) {
-    alert("Producto no válido.");
-    continue;
-  }
+function renderizarProductos() {
+  const listaProductos = document.getElementById("lista-productos");
+  productos.forEach(producto => {
+    const li = document.createElement("li");
+    li.textContent = `${producto.nombre} - Precio: $${producto.precio}`;
+    const img = document.createElement("img");
+    img.src = producto.imagen;
+    li.appendChild(img);
+    const botonAgregar = document.createElement("button");
+    botonAgregar.textContent = "Agregar al carrito";
+    botonAgregar.addEventListener("click", () => {
+      agregarAlCarrito(producto.nombre, producto.precio, producto.imagen);
+    });
+    li.appendChild(botonAgregar);
+    listaProductos.appendChild(li);
+  });
+}
 
-  let cantidad = prompt(`Ingrese la cantidad de ${producto} que desea comprar:`);
+renderizarProductos();
 
-  let item = {
-    nombre: seleccion.nombre,
-    precio: seleccion.precio,
-    cantidad: parseInt(cantidad)
-  };
+vaciarCarrito.addEventListener("click", () => {
+  carrito = [];
+  actualizarCarrito();
+});
 
-  carrito.push(item);
-  total += item.precio * item.cantidad;
-
-  alert(`${producto} ha sido agregado al carrito.`);
+// Cargar el carrito guardado en LocalStorage al cargar la página
+const carritoGuardado = localStorage.getItem("carrito");
+if (carritoGuardado) {
+  carrito = JSON.parse(carritoGuardado);
+  actualizarCarrito();
 }
